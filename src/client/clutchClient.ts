@@ -1,6 +1,6 @@
 import { SapphireClient } from '@sapphire/framework';
 import mongoose from 'mongoose';
-import { ClutchClientOptions } from './clutchClientOptions';
+import type { ClutchClientOptions } from './clutchClientOptions';
 
 export class ClutchClient extends SapphireClient {
 	clutchClientOptions: ClutchClientOptions;
