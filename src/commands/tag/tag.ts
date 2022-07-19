@@ -53,8 +53,13 @@ export class TagCommand extends Command {
 	}
 
 	private async TagSetCommand(interaction: Command.ChatInputInteraction) {
-		const tagName = interaction.options.getString('name');
-		const tag = await TagModel.findOne({ name: tagName }).exec();
+		const tagName = interaction.options.getString('name', true);
+		const tag = await TagModel.findByName(tagName);
+		const conflictingTag = await TagModel.findByAlias(tagName);
+		if (conflictingTag)
+			return await interaction.reply(
+				`❌ cannot set tag (\`${tagName}\`) as another tag is using this name as an alias (\`${conflictingTag.name}\`)`
+			);
 		const modal = new Modal()
 			.setTitle(`Tag Set (${tagName})`)
 			.setCustomId(`tagSetModal@${tagName}`);

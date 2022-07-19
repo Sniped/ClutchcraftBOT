@@ -18,7 +18,7 @@ export class TagRequestedListener extends Listener {
 		message: Message;
 		commandName: string;
 	}) {
-		const tag = await TagModel.findByName(commandName);
+		const tag = await TagModel.findByNameOrAlias(commandName);
 		if (!tag) return;
 		const embed = new MessageEmbed()
 			.setDescription(tag.content)
