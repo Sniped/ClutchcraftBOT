@@ -52,6 +52,26 @@ export class TagCommand extends Command {
 		return;
 	}
 
+	private async TagAliasCommand(interaction: Command.ChatInputInteraction) {
+		const subcommand = interaction.options.getSubcommand(true);
+
+		switch (subcommand) {
+			case 'add':
+				this.TagAliasAddCommand(interaction);
+				return;
+			case 'remove':
+				this.TagAliasRemoveCommand(interaction);
+				return;
+			case 'list':
+				this.TagAliasListCommand(interaction);
+				return;
+			default:
+				break;
+		}
+
+		return;
+	}
+
 	private async TagSetCommand(interaction: Command.ChatInputInteraction) {
 		const tagName = interaction.options.getString('name', true);
 		const tag = await TagModel.findByName(tagName);
@@ -128,27 +148,20 @@ export class TagCommand extends Command {
 	}
 
 	private async TagRenameCommand(interaction: Command.ChatInputInteraction) {
-		await interaction.reply('TODO');
-	}
-
-	private async TagAliasCommand(interaction: Command.ChatInputInteraction) {
-		const subcommand = interaction.options.getSubcommand(true);
-
-		switch (subcommand) {
-			case 'add':
-				this.TagAliasAddCommand(interaction);
-				return;
-			case 'remove':
-				this.TagAliasRemoveCommand(interaction);
-				return;
-			case 'list':
-				this.TagAliasListCommand(interaction);
-				return;
-			default:
-				break;
-		}
-
-		return;
+		const tagName = interaction.options.getString('name', true);
+		const tag = await TagModel.findByName(tagName);
+		if (!tag)
+			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+		const newTagName = interaction.options.getString('new_name', true);
+		const conflictingTag = await TagModel.findByAlias(newTagName);
+		if (conflictingTag)
+			return await interaction.reply(
+				`❌ cannot rename tag (\`${tagName}\`) as a tag is already using the name as an alias (\`${conflictingTag.name}\`)`
+			);
+		await tag.updateOne({ name: newTagName }).exec();
+		return await interaction.reply(
+			`✅ successfully renamed tag (\`${tagName} -> ${newTagName}\`)`
+		);
 	}
 
 	private async TagAliasAddCommand(interaction: Command.ChatInputInteraction) {
