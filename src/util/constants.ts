@@ -6,3 +6,10 @@ export const WHITELISTED_GUILDS = [
 	'990803271000133663', // ClutchCraft Staff
 	'998720199073222676', // ClutchCraft Bot Development
 ];
+
+export const EMOJIS = {
+	WHITE_CHECK_MARK: '✅',
+	X_MARK: '❌',
+	WARNING: '⚠️',
+	NAME_BADGE: '📛',
+};

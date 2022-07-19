@@ -1,6 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import type { ModalSubmitInteraction } from 'discord.js';
 import { Tag, TagModel } from '../../model/tag';
+import { EMOJIS } from '../../util/constants';
 
 export class TagSetFormSubmitListener extends Listener {
 	constructor(context: Listener.Context, options: Listener.Options) {
@@ -23,7 +24,7 @@ export class TagSetFormSubmitListener extends Listener {
 		const contentInputComponent = interaction.components[0].components[0];
 		if (tag && tag.content === contentInputComponent.value)
 			return await interaction.reply(
-				`⚠️ no changes were made to tag (\`${tag.name}\`)`
+				`${EMOJIS.WARNING} no changes were made to tag (\`${tag.name}\`)`
 			);
 		else if (tag) {
 			await tag
@@ -32,7 +33,9 @@ export class TagSetFormSubmitListener extends Listener {
 					lastEditorId: interaction.user.id,
 				})
 				.exec();
-			return await interaction.reply(`✅ updated tag (\`${tagName}\`)`);
+			return await interaction.reply(
+				`${EMOJIS.WHITE_CHECK_MARK} updated tag (\`${tagName}\`)`
+			);
 		} else if (!tag) {
 			const tag = {
 				name: tagName,
@@ -41,7 +44,9 @@ export class TagSetFormSubmitListener extends Listener {
 				lastEditorId: interaction.user.id,
 			} as Tag;
 			TagModel.create(tag);
-			return await interaction.reply(`✅ created tag (\`${tagName}\`)`);
+			return await interaction.reply(
+				`${EMOJIS.WHITE_CHECK_MARK} created tag (\`${tagName}\`)`
+			);
 		}
 	}
 }

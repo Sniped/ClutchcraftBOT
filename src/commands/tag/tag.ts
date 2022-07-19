@@ -7,6 +7,7 @@ import {
 	TextInputComponent,
 } from 'discord.js';
 import { TagModel, TagQueryType } from '../../model/tag';
+import { EMOJIS } from '../../util/constants';
 import { prettyDate } from '../../util/functions';
 
 // TODO: update this entire command once the subcommand plugin comes out
@@ -77,7 +78,7 @@ export class TagCommand extends Command {
 		const conflictingTag = await TagModel.findByAlias(tagName);
 		if (conflictingTag)
 			return await interaction.reply(
-				`❌ cannot set tag (\`${tagName}\`) as another tag is using this name as an alias (\`${conflictingTag.name}\`)`
+				`${EMOJIS.X_MARK} cannot set tag (\`${tagName}\`) as another tag is using this name as an alias (\`${conflictingTag.name}\`)`
 			);
 		const modal = new Modal()
 			.setTitle(`Tag Set (${tagName})`)
@@ -100,7 +101,9 @@ export class TagCommand extends Command {
 		const tagName = interaction.options.getString('name', true).toLowerCase();
 		const tag = await TagModel.findByName(tagName);
 		if (!tag)
-			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+			return await interaction.reply(
+				`${EMOJIS.X_MARK} no tag found (\`${tagName}\`)`
+			);
 		let authorUser = this.container.client.users.resolve(tag.authorId);
 		if (!authorUser)
 			authorUser = await this.container.client.users
@@ -150,16 +153,18 @@ export class TagCommand extends Command {
 		const tagName = interaction.options.getString('name', true).toLowerCase();
 		const tag = await TagModel.findByName(tagName);
 		if (!tag)
-			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+			return await interaction.reply(
+				`${EMOJIS.X_MARK} no tag found (\`${tagName}\`)`
+			);
 		const newTagName = interaction.options.getString('new_name', true);
 		const conflictingTag = await TagModel.findByAlias(newTagName);
 		if (conflictingTag)
 			return await interaction.reply(
-				`❌ cannot rename tag (\`${tagName}\`) as a tag is already using the name as an alias (\`${conflictingTag.name}\`)`
+				`${EMOJIS.X_MARK} cannot rename tag (\`${tagName}\`) as a tag is already using the name as an alias (\`${conflictingTag.name}\`)`
 			);
 		await tag.updateOne({ name: newTagName }).exec();
 		return await interaction.reply(
-			`✅ successfully renamed tag (\`${tagName} -> ${newTagName}\`)`
+			`${EMOJIS.WHITE_CHECK_MARK} successfully renamed tag (\`${tagName} -> ${newTagName}\`)`
 		);
 	}
 
@@ -170,23 +175,25 @@ export class TagCommand extends Command {
 			.toLowerCase();
 		const tag = await TagModel.findByName(tagName);
 		if (!tag)
-			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+			return await interaction.reply(
+				`${EMOJIS.X_MARK} no tag found (\`${tagName}\`)`
+			);
 		const conflictingTag = await TagModel.findByNameOrAlias(alias);
 		if (conflictingTag) {
 			const conflictingTagType = conflictingTag.type;
 			const conflictingTagRes = conflictingTag.result!;
 			if (conflictingTagType == TagQueryType.Name)
 				return await interaction.reply(
-					`❌ cannot add alias as it is already being used as a tag name (\`${tagName}\`)`
+					`${EMOJIS.X_MARK} cannot add alias as it is already being used as a tag name (\`${tagName}\`)`
 				);
 			if (conflictingTagType == TagQueryType.Alias)
 				return await interaction.reply(
-					`❌ cannot add alias (\`${alias}\`) as a tag is already using the alias (\`${conflictingTagRes.name}\`)`
+					`${EMOJIS.X_MARK} cannot add alias (\`${alias}\`) as a tag is already using the alias (\`${conflictingTagRes.name}\`)`
 				);
 		}
 		await tag.updateOne({ aliases: [...tag.aliases, alias] }).exec();
 		return await interaction.reply(
-			`✅ successfully added alias (\`${alias}\`) to tag (\`${tagName}\`)`
+			`${EMOJIS.WHITE_CHECK_MARK} successfully added alias (\`${alias}\`) to tag (\`${tagName}\`)`
 		);
 	}
 
@@ -194,9 +201,11 @@ export class TagCommand extends Command {
 		const tagName = interaction.options.getString('name', true).toLowerCase();
 		const tag = await TagModel.findByName(tagName);
 		if (!tag)
-			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+			return await interaction.reply(
+				`${EMOJIS.X_MARK} no tag found (\`${tagName}\`)`
+			);
 		return await interaction.reply(
-			`📛 \`${tagName}\` has the following aliases: ${tag.aliases
+			`${EMOJIS.X_MARK} \`${tagName}\` has the following aliases: ${tag.aliases
 				.map(a => `\`${a}\``)
 				.join(', ')}`
 		);
@@ -211,22 +220,24 @@ export class TagCommand extends Command {
 			.getString('alias_name', true)
 			.toLowerCase();
 		if (!tag)
-			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+			return await interaction.reply(
+				`${EMOJIS.X_MARK} no tag found (\`${tagName}\`)`
+			);
 		if (tag.aliases.includes(alias)) {
 			const aliasedTag = await TagModel.findByAlias(alias);
 			if (aliasedTag)
 				return await interaction.reply(
-					`❌ tag (\`${tagName}\`) does not include alias (\`${alias}\`), but another tag (\`${aliasedTag.name}\`) uses it`
+					`${EMOJIS.X_MARK} tag (\`${tagName}\`) does not include alias (\`${alias}\`), but another tag (\`${aliasedTag.name}\`) uses it`
 				);
 			return await interaction.reply(
-				`❌ tag (\`${tagName}\`) does not include alias (\`${alias}\`)`
+				`${EMOJIS.X_MARK} tag (\`${tagName}\`) does not include alias (\`${alias}\`)`
 			);
 		}
 		await tag
 			.updateOne({ aliases: tag.aliases.filter(a => a !== alias) })
 			.exec();
 		return await interaction.reply(
-			`✅ removed alias (\`${alias}\`) from tag (\`${tagName}\`)`
+			`${EMOJIS.WHITE_CHECK_MARK} removed alias (\`${alias}\`) from tag (\`${tagName}\`)`
 		);
 	}
 
