@@ -205,7 +205,7 @@ export class TagCommand extends Command {
 				`${EMOJIS.X_MARK} no tag found (\`${tagName}\`)`
 			);
 		return await interaction.reply(
-			`${EMOJIS.X_MARK} \`${tagName}\` has the following aliases: ${tag.aliases
+			`${EMOJIS.NAME_BADGE} \`${tagName}\` has the following aliases: ${tag.aliases
 				.map(a => `\`${a}\``)
 				.join(', ')}`
 		);
