@@ -1,6 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import { Message, MessageEmbed } from 'discord.js';
 import { TagModel } from '../../model/tag';
+import { IMGUR_LINK_REGEX } from '../../util/constants';
 
 export class TagRequestedListener extends Listener {
 	constructor(context: Listener.Context, options: Listener.Options) {
@@ -20,9 +21,20 @@ export class TagRequestedListener extends Listener {
 	}) {
 		const tag = await TagModel.findByNameOrAlias(commandName.toLowerCase());
 		if (!tag || !tag.result) return;
+		const matches = tag.result.content.match(IMGUR_LINK_REGEX);
 		const embed = new MessageEmbed()
-			.setDescription(tag.result.content)
-			.setColor('GREEN');
+			.setColor('GREEN')
+			.setFooter({
+				text: `Requested by ${message.author.tag}`,
+				iconURL: message.author.avatarURL()!,
+			});
+		let content = tag.result.content;
+		if (matches) {
+			const link = matches[0];
+			content = tag.result.content.replace(link, '');
+			embed.setImage(link);
+		}
+		embed.setDescription(content);
 		await tag.result.updateOne({ uses: tag.result.uses + 1 }).exec();
 		message.channel.send({ embeds: [embed] });
 	}
