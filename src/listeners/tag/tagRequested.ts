@@ -23,6 +23,7 @@ export class TagRequestedListener extends Listener {
 		const embed = new MessageEmbed()
 			.setDescription(tag.content)
 			.setColor('GREEN');
+		await tag.updateOne({ uses: tag.uses + 1 }).exec();
 		message.channel.send({ embeds: [embed] });
 	}
 }
