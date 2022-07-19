@@ -1,11 +1,13 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import {
 	MessageActionRow,
+	MessageEmbed,
 	Modal,
 	ModalActionRowComponent,
 	TextInputComponent,
 } from 'discord.js';
 import { TagModel } from '../../model/tag';
+import { prettyDate } from '../../util/functions';
 
 // TODO: update this entire command once the subcommand plugin comes out
 export class TagCommand extends Command {
@@ -71,7 +73,41 @@ export class TagCommand extends Command {
 	}
 
 	private async TagInfoCommand(interaction: Command.ChatInputInteraction) {
-		await interaction.reply('TODO');
+		const tagName = interaction.options.getString('name', true);
+		const tag = await TagModel.findByName(tagName);
+		if (!tag)
+			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+		let authorUser = this.container.client.users.resolve(tag.authorId);
+		if (!authorUser)
+			authorUser = await this.container.client.users
+				.fetch(tag.authorId)
+				.catch(() => (authorUser = null));
+		let lastEditorUser = this.container.client.users.resolve(tag.lastEditorId);
+		if (!lastEditorUser)
+			lastEditorUser = await this.container.client.users
+				.fetch(tag.lastEditorId)
+				.catch(() => (lastEditorUser = null));
+		const embed = new MessageEmbed()
+			.addField('Name', tag.name)
+			.addField(
+				'Author',
+				`${authorUser ? `${authorUser.tag} (${authorUser.id})` : tag.authorId}`,
+				true
+			)
+			.addField(
+				'Last Edited By',
+				`${
+					lastEditorUser
+						? `${lastEditorUser.tag} (${lastEditorUser.id})`
+						: tag.lastEditorId
+				}`,
+				true
+			)
+			.addField('Uses', tag.uses.toString())
+			.addField('Created At', prettyDate(tag.createdAt), true)
+			.addField('Updated At', prettyDate(tag.updatedAt), true)
+			.setColor('DARK_GREEN');
+		return await interaction.reply({ embeds: [embed] });
 	}
 
 	private async TagListCommand(interaction: Command.ChatInputInteraction) {
