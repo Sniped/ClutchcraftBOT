@@ -135,6 +135,14 @@
   dependencies:
     "@sapphire/utilities" "^3.7.0"
 
+"@sapphire/ts-config@^3.3.4":
+  version "3.3.4"
+  resolved "https://registry.yarnpkg.com/@sapphire/ts-config/-/ts-config-3.3.4.tgz#dabab6a3c1a862ea753b8d4e67a6ac07e9f5d7a7"
+  integrity sha512-mWEUxCXh3cHKI7C8HJ049exVTMNaq+A/lJEDfM5ENSQ/OOZHd5DdmXn2jrYqFWbTRCHa0Vp2FAmACWBwePsBtg==
+  dependencies:
+    tslib "^2.3.1"
+    typescript "^4.6.3"
+
 "@sapphire/utilities@^3.6.2", "@sapphire/utilities@^3.7.0":
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/@sapphire/utilities/-/utilities-3.7.0.tgz#ec08837324a91fe58790f2961f2e874a82203247"
@@ -552,7 +560,7 @@ tslib@^2.3.1, tslib@^2.4.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
   integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
 
-typescript@^4.7.4:
+typescript@^4.6.3, typescript@^4.7.4:
   version "4.7.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
   integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
