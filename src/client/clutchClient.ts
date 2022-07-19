@@ -6,7 +6,12 @@ export class ClutchClient extends SapphireClient {
 	clutchClientOptions: ClutchClientOptions;
 
 	constructor(clutchClientOptions: ClutchClientOptions) {
-		super({ intents: ['GUILDS', 'GUILD_MESSAGES'] });
+		super({
+			intents: ['GUILDS', 'GUILD_MESSAGES'],
+			loadMessageCommandListeners: true,
+			defaultPrefix: '!',
+			disableMentionPrefix: true,
+		});
 
 		this.clutchClientOptions = clutchClientOptions;
 	}
