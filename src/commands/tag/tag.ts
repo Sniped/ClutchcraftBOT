@@ -116,7 +116,15 @@ export class TagCommand extends Command {
 	}
 
 	private async TagListCommand(interaction: Command.ChatInputInteraction) {
-		await interaction.reply('TODO');
+		// TODO: add pagination to this if necessary in the future
+		const sortedTags = (await TagModel.find().exec()).sort((a, b) =>
+			a.name.localeCompare(b.name)
+		);
+		const embed = new MessageEmbed()
+			.setTitle(`Showing ${sortedTags.length} tags`)
+			.setDescription(sortedTags.map(tag => `\`${tag.name}\``).join(', '))
+			.setColor('DARK_GREEN');
+		await interaction.reply({ embeds: [embed] });
 	}
 
 	private async TagRenameCommand(interaction: Command.ChatInputInteraction) {
