@@ -73,7 +73,7 @@ export class TagCommand extends Command {
 	}
 
 	private async TagSetCommand(interaction: Command.ChatInputInteraction) {
-		const tagName = interaction.options.getString('name', true);
+		const tagName = interaction.options.getString('name', true).toLowerCase();
 		const tag = await TagModel.findByName(tagName);
 		const conflictingTag = await TagModel.findByAlias(tagName);
 		if (conflictingTag)
@@ -98,7 +98,7 @@ export class TagCommand extends Command {
 	}
 
 	private async TagInfoCommand(interaction: Command.ChatInputInteraction) {
-		const tagName = interaction.options.getString('name', true);
+		const tagName = interaction.options.getString('name', true).toLowerCase();
 		const tag = await TagModel.findByName(tagName);
 		if (!tag)
 			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
@@ -148,7 +148,7 @@ export class TagCommand extends Command {
 	}
 
 	private async TagRenameCommand(interaction: Command.ChatInputInteraction) {
-		const tagName = interaction.options.getString('name', true);
+		const tagName = interaction.options.getString('name', true).toLowerCase();
 		const tag = await TagModel.findByName(tagName);
 		if (!tag)
 			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
