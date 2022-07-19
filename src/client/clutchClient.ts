@@ -1,9 +1,12 @@
 import { SapphireClient } from '@sapphire/framework';
 import mongoose from 'mongoose';
+import { CooldownManager } from '../structure/cooldownManager';
+import { ONE_MINUTE_MS } from '../util/constants';
 import type { ClutchClientOptions } from './clutchClientOptions';
 
 export class ClutchClient extends SapphireClient {
 	clutchClientOptions: ClutchClientOptions;
+	tagCooldownManager: CooldownManager;
 
 	constructor(clutchClientOptions: ClutchClientOptions) {
 		super({
@@ -14,6 +17,7 @@ export class ClutchClient extends SapphireClient {
 		});
 
 		this.clutchClientOptions = clutchClientOptions;
+		this.tagCooldownManager = new CooldownManager(ONE_MINUTE_MS);
 	}
 
 	async connectToMongo() {
@@ -23,5 +27,12 @@ export class ClutchClient extends SapphireClient {
 	async start(token: string) {
 		await this.connectToMongo();
 		await this.login(token);
+	}
+}
+
+declare module '@sapphire/framework' {
+	interface SapphireClient {
+		clutchClientOptions: ClutchClientOptions;
+		tagCooldownManager: CooldownManager;
 	}
 }
