@@ -19,11 +19,11 @@ export class TagRequestedListener extends Listener {
 		commandName: string;
 	}) {
 		const tag = await TagModel.findByNameOrAlias(commandName.toLowerCase());
-		if (!tag) return;
+		if (!tag || !tag.result) return;
 		const embed = new MessageEmbed()
-			.setDescription(tag.content)
+			.setDescription(tag.result.content)
 			.setColor('GREEN');
-		await tag.updateOne({ uses: tag.uses + 1 }).exec();
+		await tag.result.updateOne({ uses: tag.result.uses + 1 }).exec();
 		message.channel.send({ embeds: [embed] });
 	}
 }

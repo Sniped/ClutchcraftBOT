@@ -6,7 +6,7 @@ import {
 	ModalActionRowComponent,
 	TextInputComponent,
 } from 'discord.js';
-import { TagModel } from '../../model/tag';
+import { TagModel, TagQueryType } from '../../model/tag';
 import { prettyDate } from '../../util/functions';
 
 // TODO: update this entire command once the subcommand plugin comes out
@@ -23,6 +23,16 @@ export class TagCommand extends Command {
 		const subcommand = interaction.options.getSubcommand(true);
 		const subcommandGroup = interaction.options.getSubcommandGroup(false);
 
+		if (subcommandGroup) {
+			switch (subcommandGroup) {
+				case 'alias':
+					this.TagAliasCommand(interaction);
+					return;
+				default:
+					return;
+			}
+		}
+
 		switch (subcommand) {
 			case 'set':
 				this.TagSetCommand(interaction);
@@ -37,19 +47,8 @@ export class TagCommand extends Command {
 				this.TagListCommand(interaction);
 				return;
 			default:
-				// Proceed to subcommand groups
-				break;
-		}
-
-		switch (subcommandGroup) {
-			case 'alias':
-				this.TagAliasCommand(interaction);
 				return;
-			default:
-				break;
 		}
-
-		return;
 	}
 
 	private async TagAliasCommand(interaction: Command.ChatInputInteraction) {
@@ -165,17 +164,70 @@ export class TagCommand extends Command {
 	}
 
 	private async TagAliasAddCommand(interaction: Command.ChatInputInteraction) {
-		await interaction.reply('TODO');
+		const tagName = interaction.options.getString('name', true).toLowerCase();
+		const alias = interaction.options
+			.getString('alias_name', true)
+			.toLowerCase();
+		const tag = await TagModel.findByName(tagName);
+		if (!tag)
+			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+		const conflictingTag = await TagModel.findByNameOrAlias(alias);
+		if (conflictingTag) {
+			const conflictingTagType = conflictingTag.type;
+			const conflictingTagRes = conflictingTag.result!;
+			if (conflictingTagType == TagQueryType.Name)
+				return await interaction.reply(
+					`❌ cannot add alias as it is already being used as a tag name (\`${tagName}\`)`
+				);
+			if (conflictingTagType == TagQueryType.Alias)
+				return await interaction.reply(
+					`❌ cannot add alias (\`${alias}\`) as a tag is already using the alias (\`${conflictingTagRes.name}\`)`
+				);
+		}
+		await tag.updateOne({ aliases: [...tag.aliases, alias] }).exec();
+		return await interaction.reply(
+			`✅ successfully added alias (\`${alias}\`) to tag (\`${tagName}\`)`
+		);
 	}
 
 	private async TagAliasListCommand(interaction: Command.ChatInputInteraction) {
-		await interaction.reply('TODO');
+		const tagName = interaction.options.getString('name', true).toLowerCase();
+		const tag = await TagModel.findByName(tagName);
+		if (!tag)
+			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+		return await interaction.reply(
+			`📛 \`${tagName}\` has the following aliases: ${tag.aliases
+				.map(a => `\`${a}\``)
+				.join(', ')}`
+		);
 	}
 
 	private async TagAliasRemoveCommand(
 		interaction: Command.ChatInputInteraction
 	) {
-		await interaction.reply('TODO');
+		const tagName = interaction.options.getString('name', true).toLowerCase();
+		const tag = await TagModel.findByName(tagName);
+		const alias = interaction.options
+			.getString('alias_name', true)
+			.toLowerCase();
+		if (!tag)
+			return await interaction.reply(`❌ no tag found (\`${tagName}\`)`);
+		if (tag.aliases.includes(alias)) {
+			const aliasedTag = await TagModel.findByAlias(alias);
+			if (aliasedTag)
+				return await interaction.reply(
+					`❌ tag (\`${tagName}\`) does not include alias (\`${alias}\`), but another tag (\`${aliasedTag.name}\`) uses it`
+				);
+			return await interaction.reply(
+				`❌ tag (\`${tagName}\`) does not include alias (\`${alias}\`)`
+			);
+		}
+		await tag
+			.updateOne({ aliases: tag.aliases.filter(a => a !== alias) })
+			.exec();
+		return await interaction.reply(
+			`✅ removed alias (\`${alias}\`) from tag (\`${tagName}\`)`
+		);
 	}
 
 	override registerApplicationCommands(registry: Command.Registry) {

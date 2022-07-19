@@ -33,15 +33,20 @@ export class Tag {
 
 	static async findByNameOrAlias(this: ModelType<Tag>, query: string) {
 		const nameQuery = await TagModel.findByName(query);
-		if (nameQuery) return nameQuery;
+		if (nameQuery) return { type: TagQueryType.Name, result: nameQuery };
 		const aliasQuery = await TagModel.findByAlias(query);
-		if (aliasQuery) return aliasQuery;
+		if (aliasQuery) return { type: TagQueryType.Alias, result: aliasQuery };
 		return null;
 	}
 
 	static async findByAlias(this: ModelType<Tag>, alias: string) {
 		return await this.findOne({ aliases: alias }).exec();
 	}
+}
+
+export enum TagQueryType {
+	Name,
+	Alias,
 }
 
 export const TagModel = getModelForClass(Tag, {
