@@ -204,8 +204,14 @@ export class TagCommand extends Command {
 			return await interaction.reply(
 				`${EMOJIS.X_MARK} no tag found (\`${tagName}\`)`
 			);
+		if (tag.aliases.length == 0)
+			return await interaction.reply(
+				`${EMOJIS.NAME_BADGE} \`${tagName}\` has no aliases`
+			);
 		return await interaction.reply(
-			`${EMOJIS.NAME_BADGE} \`${tagName}\` has the following aliases: ${tag.aliases
+			`${
+				EMOJIS.NAME_BADGE
+			} \`${tagName}\` has the following aliases: ${tag.aliases
 				.map(a => `\`${a}\``)
 				.join(', ')}`
 		);
@@ -223,7 +229,7 @@ export class TagCommand extends Command {
 			return await interaction.reply(
 				`${EMOJIS.X_MARK} no tag found (\`${tagName}\`)`
 			);
-		if (tag.aliases.includes(alias)) {
+		if (!tag.aliases.includes(alias)) {
 			const aliasedTag = await TagModel.findByAlias(alias);
 			if (aliasedTag)
 				return await interaction.reply(
