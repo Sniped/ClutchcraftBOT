@@ -1,5 +1,5 @@
 export const IMGUR_LINK_REGEX =
-	/((?:https?:)?\/\/(\w+\.)?imgur\.com\/(\S*)(\.[a-zA-Z]{4}))/im;
+	/((?:https?:)?\/\/(\w+\.)?imgur\.com\/(\S*)(\.[a-zA-Z]{3,}))/im;
 
 export const WHITELISTED_GUILDS = [
 	'975450713461235842', // ClutchCraft
