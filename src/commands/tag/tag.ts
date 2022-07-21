@@ -47,6 +47,9 @@ export class TagCommand extends Command {
 			case 'list':
 				this.TagListCommand(interaction);
 				return;
+			case 'delete':
+				this.TagDeleteCommand(interaction);
+				return;
 			default:
 				return;
 		}
@@ -164,7 +167,20 @@ export class TagCommand extends Command {
 			);
 		await tag.updateOne({ name: newTagName }).exec();
 		return await interaction.reply(
-			`${EMOJIS.WHITE_CHECK_MARK} successfully renamed tag (\`${tagName} -> ${newTagName}\`)`
+			`${EMOJIS.WHITE_CHECK_MARK} renamed tag (\`${tagName} -> ${newTagName}\`)`
+		);
+	}
+
+	private async TagDeleteCommand(interaction: Command.ChatInputInteraction) {
+		const tagName = interaction.options.getString('name', true).toLowerCase();
+		const tag = await TagModel.findByName(tagName);
+		if (!tag)
+			return await interaction.reply(
+				`${EMOJIS.X_MARK} no tag found (\`${tagName}\`)`
+			);
+		await tag.delete();
+		return await interaction.reply(
+			`${EMOJIS.WHITE_CHECK_MARK} deleted tag (\`${tagName}\`)`
 		);
 	}
 
@@ -193,7 +209,7 @@ export class TagCommand extends Command {
 		}
 		await tag.updateOne({ aliases: [...tag.aliases, alias] }).exec();
 		return await interaction.reply(
-			`${EMOJIS.WHITE_CHECK_MARK} successfully added alias (\`${alias}\`) to tag (\`${tagName}\`)`
+			`${EMOJIS.WHITE_CHECK_MARK} added alias (\`${alias}\`) to tag (\`${tagName}\`)`
 		);
 	}
 
@@ -303,6 +319,17 @@ export class TagCommand extends Command {
 					// tag list
 					.addSubcommand(command =>
 						command.setName('list').setDescription('Lists all of the tags')
+					)
+					.addSubcommand(command =>
+						command
+							.setName('delete')
+							.setDescription('Deletes a tag')
+							.addStringOption(opt =>
+								opt
+									.setName('name')
+									.setDescription('The name of the tag you wish to delete')
+									.setRequired(true)
+							)
 					)
 					// tag alias
 					.addSubcommandGroup(builder =>
