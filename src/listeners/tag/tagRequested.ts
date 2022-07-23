@@ -19,10 +19,12 @@ export class TagRequestedListener extends Listener {
 		message: Message;
 		commandName: string;
 	}) {
+		if (!message.guild) return;
 		const tag = await TagModel.findByNameOrAlias(commandName.toLowerCase());
 		if (!tag || !tag.result) return;
 		if (
-			this.container.client.tagCooldownManager.isOnCooldown(tag.result.name)
+			this.container.client.tagCooldownManager.isOnCooldown(tag.result.name) &&
+			!message.member!.permissions.has('MANAGE_MESSAGES')
 		) {
 			await message.react(EMOJIS.STOPWATCH);
 			return;
