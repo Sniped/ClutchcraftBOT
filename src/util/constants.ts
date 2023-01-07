@@ -17,3 +17,10 @@ export const EMOJIS = {
 
 export const ONE_SECOND_MS = 1000;
 export const ONE_MINUTE_MS = 60 * ONE_SECOND_MS;
+
+export const JOINS_ANNOUNCE_CHANNELS: { [key: string]: string } = {
+	// ClutchCraft -> #welcomes
+	'975450713461235842': '978517273994223646',
+	// ClutchCraft Bot Testing -> #chat
+	'998720199073222676': '998992636935417976'
+};
